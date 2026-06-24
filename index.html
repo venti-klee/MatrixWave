@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="MatrixWave event sequence comparison visualization" />
+    <title>MatrixWave · 事件序列对比</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="MatrixWave 首页">
+          <span class="brand-mark" aria-hidden="true">
+            <i></i><i></i><i></i><i></i>
+          </span>
+          <span>
+            <strong>MatrixWave</strong>
+            <small>事件序列对比</small>
+          </span>
+        </a>
+
+        <div class="dataset-strip" aria-label="对比数据集">
+          <div class="dataset-pill dataset-a">
+            <span class="dataset-dot"></span>
+            <label for="dataset-a">数据集 A</label>
+            <select id="dataset-a">
+              <option value="may11">5 月 11 日 · 基准组</option>
+              <option value="may04">5 月 4 日 · 基准组</option>
+            </select>
+            <b id="total-a">12,480</b>
+          </div>
+          <span class="versus">对比</span>
+          <div class="dataset-pill dataset-b">
+            <span class="dataset-dot"></span>
+            <label for="dataset-b">数据集 B</label>
+            <select id="dataset-b">
+              <option value="may12">5 月 12 日 · 活动组</option>
+              <option value="may18">5 月 18 日 · 活动组</option>
+            </select>
+            <b id="total-b">13,216</b>
+          </div>
+        </div>
+
+        <div class="top-actions">
+          <button id="reset-btn" class="icon-button" title="重置视图" aria-label="重置视图">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4v6h6M20 20v-6h-6M5.5 15a7 7 0 0 0 11.8 2.3L20 14M4 10l2.7-3.3A7 7 0 0 1 18.5 9"/></svg>
+          </button>
+          <button id="help-btn" class="icon-button" title="阅读说明" aria-label="阅读说明">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.7 9a2.4 2.4 0 1 1 3.3 2.2c-.7.3-1 1-1 1.8M12 17h.01"/></svg>
+          </button>
+          <span class="status"><i></i> 已载入 2 个数据集</span>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <aside class="sidebar">
+          <div class="sidebar-heading">
+            <div>
+              <span class="eyebrow">控制面板</span>
+              <h2>分析设置</h2>
+            </div>
+            <button id="collapse-btn" class="tiny-button" aria-label="收起侧栏">‹</button>
+          </div>
+
+          <section class="control-section">
+            <h3>可见性筛选</h3>
+            <div class="range-control">
+              <div class="control-label"><label for="node-filter">节点流量</label><output id="node-output">8+</output></div>
+              <input id="node-filter" type="range" min="0" max="45" value="8" />
+              <div class="range-scale"><span>全部节点</span><span>高流量</span></div>
+            </div>
+            <div class="range-control">
+              <div class="control-label"><label for="link-filter">连线流量</label><output id="link-output">4+</output></div>
+              <input id="link-filter" type="range" min="0" max="35" value="4" />
+              <div class="range-scale"><span>全部连线</span><span>高流量</span></div>
+            </div>
+          </section>
+
+          <section class="control-section">
+            <h3>序列深度</h3>
+            <div class="step-picker" id="step-picker" role="group" aria-label="可见步骤">
+              <button class="active" data-step="1">1</button>
+              <span></span><button class="active" data-step="2">2</button>
+              <span></span><button class="active" data-step="3">3</button>
+              <span></span><button class="active" data-step="4">4</button>
+              <span></span><button class="active" data-step="5">5</button>
+            </div>
+            <p class="hint">正在显示第 1–5 步交互</p>
+          </section>
+
+          <section class="control-section">
+            <h3>视觉编码</h3>
+            <div class="field-group">
+              <label for="color-mode">颜色表示</label>
+              <select id="color-mode">
+                <option value="change">相对变化</option>
+                <option value="group">页面分组</option>
+                <option value="volume">合计流量</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label for="order-mode">节点排序方式</label>
+              <select id="order-mode">
+                <option value="volume">流量大小</option>
+                <option value="change">变化幅度</option>
+                <option value="alphabetical">名称顺序</option>
+              </select>
+            </div>
+          </section>
+
+          <section class="control-section search-section">
+            <h3>查找页面</h3>
+            <div class="search-box">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m16 16 4 4"/></svg>
+              <input id="search-input" type="search" placeholder="搜索页面名称…" autocomplete="off" />
+              <kbd>/</kbd>
+            </div>
+          </section>
+
+          <div class="sidebar-note">
+            <span>CHI 2015 复刻项目</span>
+            <p>尺寸表示流量，颜色表示两个数据集之间的变化。</p>
+          </div>
+        </aside>
+
+        <section class="content-area">
+          <div class="view-header">
+            <div>
+              <span class="eyebrow"><span id="view-kind">矩阵视图</span> · <span id="visible-summary">32 个页面 / 86 条转移</span></span>
+              <h1>五步交互中的访问路径</h1>
+              <p>逐步对比访客在产品网站中的移动方式。</p>
+            </div>
+            <div class="view-tools">
+              <div class="segmented view-switch" role="group" aria-label="可视化类型">
+                <button class="active" data-view="matrixwave">MatrixWave</button>
+                <button data-view="sankey">Sankey</button>
+              </div>
+              <div class="segmented" role="group" aria-label="指标模式">
+                <button class="active" data-metric="both">对比</button>
+                <button data-metric="a">数据集 A</button>
+                <button data-metric="b">数据集 B</button>
+              </div>
+              <button id="focus-btn" class="text-button">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></svg>
+                适应视图
+              </button>
+            </div>
+          </div>
+
+          <div class="viz-card" id="viz-card">
+            <div class="chart-stage" id="chart-stage">
+              <svg id="matrixwave" viewBox="0 0 1120 650" role="img" aria-labelledby="chart-title chart-desc">
+                <title id="chart-title">MatrixWave 事件序列对比图</title>
+                <desc id="chart-desc">由旋转的转移矩阵组成的波形链，条形表示页面，方形单元格表示页面之间的转移。</desc>
+                <defs>
+                  <filter id="soft-shadow" x="-40%" y="-40%" width="180%" height="180%">
+                    <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#203349" flood-opacity=".12"/>
+                  </filter>
+                  <pattern id="grid-pattern" width="11" height="11" patternUnits="userSpaceOnUse">
+                    <path d="M 11 0 L 0 0 0 11" fill="none" stroke="#edf0f2" stroke-width=".7"/>
+                  </pattern>
+                  <pattern id="drop-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                    <line x1="0" y1="0" x2="0" y2="6" stroke="#263440" stroke-width="1.4" opacity=".55"/>
+                  </pattern>
+                </defs>
+                <g id="wave-layer"></g>
+              </svg>
+              <div id="tooltip" class="tooltip" role="status" aria-live="polite"></div>
+            </div>
+
+            <div class="chart-footer">
+              <div class="legend-change">
+                <span>B 中下降</span>
+                <div class="color-ramp" aria-label="相对变化从负百分之百到正百分之百">
+                  <i style="--c:#5e568f"></i><i style="--c:#8178ae"></i><i style="--c:#b8b2cf"></i><i style="--c:#e7e4ec"></i><i style="--c:#f6f4f0"></i><i style="--c:#f4dec9"></i><i style="--c:#efb879"></i><i style="--c:#e78522"></i><i style="--c:#c8610b"></i>
+                </div>
+                <span>B 中上升</span>
+              </div>
+              <div class="legend-size">
+                <span class="node-sample"><i></i><i></i><i></i></span><span id="node-legend-label">节点尺寸 = 访问量</span>
+                <span class="link-sample"><i></i><i></i><i></i></span><span id="link-legend-label">内方块尺寸 = 转移量</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <aside class="detail-panel" id="detail-panel">
+          <div class="detail-empty" id="detail-empty">
+            <span class="detail-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            </span>
+            <h3>选择一条转移</h3>
+            <p id="detail-empty-text">点击任意矩阵单元格，查看流量及其变化。</p>
+          </div>
+          <div class="detail-content" id="detail-content" hidden>
+            <div class="detail-topline"><span>转移详情</span><button id="detail-close" aria-label="关闭详情">×</button></div>
+            <h3 id="detail-title">首页 → 产品</h3>
+            <p id="detail-step">第 1 步至第 2 步</p>
+            <div class="metric-grid">
+              <div><span>数据集 A</span><strong id="detail-a">—</strong><small>位访客</small></div>
+              <div><span>数据集 B</span><strong id="detail-b">—</strong><small>位访客</small></div>
+            </div>
+            <div class="change-callout" id="change-callout"><span>相对变化</span><strong id="detail-change">—</strong></div>
+            <div class="mini-bars"><i id="bar-a"></i><i id="bar-b"></i></div>
+            <p class="detail-explain" id="detail-explain">单元格背景色表示差异，内部黑方块面积表示两组数据的平均流量。</p>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <dialog id="help-dialog">
+      <button id="help-close" aria-label="关闭说明">×</button>
+      <span class="eyebrow">如何阅读 MATRIXWAVE</span>
+      <h2>每前进一步，对应一张转移矩阵</h2>
+      <div class="help-grid">
+        <div><b>1</b><h3>沿波形阅读</h3><p>每个菱形矩阵对比两个相邻步骤，斜线节点表示访客离开网站。</p></div>
+        <div><b>2</b><h3>尺寸表示流量</h3><p>较长的边缘条形代表热门页面，较大的内部黑方块代表高频转移。</p></div>
+        <div><b>3</b><h3>颜色表示变化</h3><p>紫色表示在数据集 B 中下降，橙色表示上升，接近白色表示基本稳定。</p></div>
+      </div>
+    </dialog>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

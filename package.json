@@ -1,0 +1,11 @@
+{
+  "name": "matrixwave-replica",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Interactive MatrixWave replica for comparing event sequence datasets",
+  "scripts": {
+    "dev": "node server.mjs",
+    "build": "node build.mjs",
+    "preview": "node server.mjs dist"
+  }
+}
