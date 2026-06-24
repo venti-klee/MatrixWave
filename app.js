@@ -68,6 +68,7 @@ const els = {
   totalB: document.querySelector("#total-b"),
   detailEmpty: document.querySelector("#detail-empty"),
   detailContent: document.querySelector("#detail-content"),
+  detailPanel: document.querySelector("#detail-panel"),
   chartTitle: document.querySelector("#chart-title"),
   chartDesc: document.querySelector("#chart-desc"),
   linkLegend: document.querySelector("#link-legend-label"),
@@ -535,9 +536,10 @@ function selectLink(link, source, target, transition) {
   callout.style.background = pct < 0 ? "#f0eef8" : "#fff4e9";
   callout.style.color = pct < 0 ? "#5e568f" : "#a35412";
   const max = Math.max(link.a, link.b, 1);
-  document.querySelector("#bar-a").style.height = `${Math.max(5, link.a / max * 72)}px`;
-  document.querySelector("#bar-b").style.height = `${Math.max(5, link.b / max * 72)}px`;
+  document.querySelector("#bar-a").style.height = `${Math.max(5, link.a / max * 60)}px`;
+  document.querySelector("#bar-b").style.height = `${Math.max(5, link.b / max * 60)}px`;
   render();
+  els.detailPanel.scrollTop = 0;
 }
 
 function closeDetail() {
@@ -545,6 +547,7 @@ function closeDetail() {
   els.detailEmpty.hidden = false;
   els.detailContent.hidden = true;
   render();
+  els.detailPanel.scrollTop = 0;
 }
 
 function applySearch() {
